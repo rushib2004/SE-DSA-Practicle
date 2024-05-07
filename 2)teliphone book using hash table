@@ -1,0 +1,226 @@
+class Record:
+    def __init__(self):
+        self._name = None
+        self._number = None
+
+    def get_name(self):
+        return self._name
+
+    def get_number(self):
+        return self._number
+
+    def set_name(self, name):
+        self._name = name
+
+    def set_number(self, number):
+        self._number = number
+
+    def __str__(self):
+        record = "Name: " + str(self.get_name()) + "\t" + "Number: " + str(self.get_number())
+        return record
+
+
+class hashTable:
+    def __init__(self):
+        self.size = int(input("Enter the Size of the hash table : "))
+        self.table = [None] * self.size
+        self.elementCount = 0
+        self.comparisons = 0
+
+    def isFull(self):
+        return self.elementCount == self.size
+
+    def hashFunction(self, element):
+        return element % self.size
+
+    def insert(self, record):
+        if self.isFull():
+            print("Hash Table Full")
+            return False
+
+        num = record.get_number()
+        position = self.hashFunction(num)
+
+        if self.table[position] is None:
+            self.table[position] = record
+            self.elementCount += 1
+        else:
+            while self.table[position] is not None:
+                position = (position + 1) % self.size
+            self.table[position] = record
+            self.elementCount += 1
+        return True
+
+    def search(self, record):
+        found = False
+        position = self.hashFunction(record.get_number())
+
+        if self.table[position] is not None:
+            self.comparisons += 1
+            if self.table[position].get_name() == record.get_name() and self.table[position].get_number() == record.get_number():
+                print("Phone number found at position {} and total comparisons are 1".format(position))
+                return position
+
+            while self.table[position] is not None and self.comparisons <= self.size:
+                if self.table[position].get_name() == record.get_name() and self.table[position].get_number() == record.get_number():
+                    print("Number found at position {} and total comparisons are {}".format(position, self.comparisons + 1))
+                    found = True
+                    break
+                position = (position + 1) % self.size
+                self.comparisons += 1
+
+            if not found:
+                print("Record not found")
+                return False
+
+    def display(self):
+        print("\n")
+        for i in range(self.size):
+            print("Hash Value: " + str(i) + "\t\t" + str(self.table[i]))
+
+
+class doubleHashTable:
+    def __init__(self):
+        self.size = int(input("Enter the Size of the hash table : "))
+        self.table = [None] * self.size
+        self.elementCount = 0
+        self.comparisons = 0
+
+    def isFull(self):
+        return self.elementCount == self.size
+
+    def h1(self, element):
+        return element % self.size
+
+    def h2(self, element):
+        return 5 - (element % 5)
+
+    def insert(self, record):
+        if self.isFull():
+            print("Hash Table Full")
+            return False
+
+        position = self.h1(record.get_number())
+
+        if self.table[position] is None:
+            self.table[position] = record
+            self.elementCount += 1
+        else:
+            i = 0
+            while self.table[position] is not None and i <= self.size:
+                position = (self.h1(record.get_number()) + i * self.h2(record.get_number())) % self.size
+                i += 1
+            self.table[position] = record
+            self.elementCount += 1
+        return True
+
+    def search(self, record):
+        found = False
+        position = self.h1(record.get_number())
+
+        if self.table[position] is not None:
+            self.comparisons += 1
+            if self.table[position].get_name() == record.get_name() and self.table[position].get_number() == record.get_number():
+                print("Phone number found at position {} and total comparisons are 1".format(position))
+                return position
+
+            i = 1
+            while i <= self.size:
+                position = (self.h1(record.get_number()) + i * self.h2(record.get_number())) % self.size
+
+                if self.table[position] is not None:
+                    self.comparisons += 1
+                    if self.table[position].get_name() == record.get_name() and self.table[position].get_number() == record.get_number():
+                        found = True
+                        break
+                    else:
+                        found = False
+                        i += 1
+
+            if found:
+                print("Phone number found at position {}".format(position))
+            else:
+                print("Record not Found")
+            return found
+
+    def display(self):
+        print("\n")
+        for i in range(self.size):
+            print("Hash Value: " + str(i) + "\t\t" + str(self.table[i]))
+
+
+def input_record():
+    record = Record()
+    name = input("Enter Name:")
+    number = int(input("Enter Number:"))
+    record.set_name(name)
+    record.set_number(number)
+    return record
+
+
+choice1 = 0
+while choice1 != 3:
+    print("************************")
+    print("1. Linear Probing      *")
+    print("2. Double Hashing      *")
+    print("3. Exit                *")
+    print("************************")
+
+    choice1 = int(input("Enter Choice"))
+    if choice1 > 3:
+        print("Please Enter Valid Choice")
+
+    if choice1 == 1:
+
+        h1 = hashTable()
+        choice2 = 0
+        while choice2 != 4:
+            print("************************")
+            print("1. Insert              *")
+            print("2. Search              *")
+            print("3. Display             *")
+            print("4. Back                *")
+            print("************************")
+
+            choice2 = int(input("Enter Choice"))
+            if choice2 > 4:
+                print("Please Enter Valid Choice")
+
+            if choice2 == 1:
+                record = input_record()
+                h1.insert(record)
+
+            elif choice2 == 2:
+                record = input_record()
+                position = h1.search(record)
+
+            elif choice2 == 3:
+                h1.display()
+
+    elif choice1 == 2:
+
+        h2 = doubleHashTable()
+        choice2 = 0
+        while choice2 != 4:
+            print("************************")
+            print("1. Insert              *")
+            print("2. Search              *")
+            print("3. Display             *")
+            print("4. Back                *")
+            print("************************")
+
+            choice2 = int(input("Enter Choice"))
+            if choice2 > 4:
+                print("Please Enter Valid Choice")
+
+            if choice2 == 1:
+                record = input_record()
+                h2.insert(record)
+
+            elif choice2 == 2:
+                record = input_record()
+                position = h2.search(record)
+
+            elif choice2 == 3:
+                h2.display()
+
